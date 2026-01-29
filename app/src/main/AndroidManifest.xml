@@ -24,7 +24,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.App.SplashScreen">
+            android:theme="@style/Theme.App.SplashScreen"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +34,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.kaamkarlo.fileprovider"
+            android:authorities="com.lyncan.opus.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

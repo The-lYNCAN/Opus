@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.kaamkarlo"
+    namespace = "com.lyncan.opus"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.kaamkarlo"
+        applicationId = "com.lyncan.opus"
         minSdk = 31
         targetSdk = 36
         versionCode = 1
