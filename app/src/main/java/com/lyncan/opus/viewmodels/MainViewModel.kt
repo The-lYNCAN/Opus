@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.UserState
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.UserState
 import com.lyncan.opus.data.user
 import com.lyncan.opus.uI.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +35,7 @@ constructor(val repo: SupabaseRepository, val userState: UserState, val subMan: 
             loaded.value = false
             user.value = repo.getCurrentUserDetails()
             userState.setUser(user.value)
+            subMan.Retrieve()
             loaded.value = true
             Log.d("MainViewModel", "User details fetched: ${user.value}" )
         }
@@ -65,7 +66,7 @@ constructor(val repo: SupabaseRepository, val userState: UserState, val subMan: 
             userState.setUser(currentUser)
             user.value = userState.getUser()
             subMan.clearAllData()
-            subMan.Retrieve()
+//            subMan.Retrieve()
         }.invokeOnCompletion {
             navController.navigate(Route.Home.route)
         }

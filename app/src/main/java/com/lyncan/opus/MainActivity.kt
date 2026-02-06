@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.lyncan.opus.Modules.SupabaseRepository
+import com.lyncan.opus.Repositories.SupabaseRepository
 import com.lyncan.opus.uI.navigation.AppNavigation
 import com.lyncan.opus.ui.theme.KaamKarloTheme
 import com.lyncan.opus.viewmodels.MainViewModel
@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
 
 
         installSplashScreen().apply {
+
             setKeepOnScreenCondition { !viewModel.loaded.value }
 //            setKeepOnScreenCondition { false }
         }

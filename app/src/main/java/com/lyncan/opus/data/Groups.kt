@@ -1,6 +1,7 @@
 package com.lyncan.opus.data
 
 import kotlinx.serialization.Serializable
+import java.sql.Timestamp
 
 @Serializable
 data class Groups(
@@ -12,5 +13,6 @@ data class Groups(
     val Table: List<List<String>>? = null,
     val admin: String,
     val description: String? = null,
-    val invite_code: String
+    val invite_code: String,
+    val updated_at: String? = null
 )

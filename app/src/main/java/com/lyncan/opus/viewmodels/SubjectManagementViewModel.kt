@@ -3,14 +3,16 @@ package com.lyncan.opus.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lyncan.opus.SubjectManagement
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SubjectRepository
+import com.lyncan.opus.entities.SubjectEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SubjectManagementViewModel @Inject constructor(val subjectManage: SubjectManagement): ViewModel(){
+class SubjectManagementViewModel @Inject constructor(val subjectManage: SubjectManagement, private val subjectRepo: SubjectRepository): ViewModel(){
     var subMan = subjectManage
     private val subjectList = MutableStateFlow(subMan.subjectList)
     val subjects = subjectList
@@ -36,10 +38,11 @@ class SubjectManagementViewModel @Inject constructor(val subjectManage: SubjectM
         subjectList.value = subjectManage.subjectList
         Log.d("SubjectManagementVM", subMan.subjectList.toString())
     }
-    fun createSubject(subjectName: String, subjectCode: String){
+    fun createSubject(subjectName: String, subjectCode: String?, type: Int){
         viewModelScope.launch {
             loading.value = true
-            subMan.createSubject(subjectName)
+
+            subMan.createSubject(subjectName, subjectCode, type)
             loading.value = false
         }
     }

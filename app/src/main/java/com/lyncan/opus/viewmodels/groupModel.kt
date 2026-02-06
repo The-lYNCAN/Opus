@@ -3,13 +3,16 @@ package com.lyncan.opus.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.UserState
+import com.lyncan.opus.DAOs.SubjectDAO
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SubjectRepository
+import com.lyncan.opus.Repositories.UserState
 import com.lyncan.opus.data.Assignment
 import com.lyncan.opus.data.Groups
 import com.lyncan.opus.data.Subject
 import com.lyncan.opus.data.user
+import com.lyncan.opus.entities.SubjectEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +24,8 @@ class groupModel @Inject constructor(
     private val repo: SupabaseRepository,
     private val appScope: CoroutineScope,
     private val userState: UserState,
-    private val subMan: SubjectManagement
+    private val subMan: SubjectManagement,
+    private val subjectDAO: SubjectRepository
 ): ViewModel() {
     private val _user = MutableStateFlow<user?>(null)
     val user = _user
@@ -36,7 +40,7 @@ class groupModel @Inject constructor(
     val members = _members
     init {
         viewModelScope.launch {
-            subMan.Retrieve()
+//            subMan.Retrieve()
             _user.value = userState.getUser()
             Log.d("This is user", "${_user.value}")
             val result = repo.database().from("Group").select {
@@ -59,6 +63,7 @@ class groupModel @Inject constructor(
                     }
                 }.decodeList<user>()
             }
+
         }
     }
     fun deleteGroup(){

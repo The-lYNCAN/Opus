@@ -2,9 +2,9 @@ package com.lyncan.opus.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.UserState
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.UserState
 import com.lyncan.opus.data.Assignment
 import com.lyncan.opus.data.Uploads
 import dagger.hilt.android.lifecycle.HiltViewModel

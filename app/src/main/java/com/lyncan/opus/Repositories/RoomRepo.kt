@@ -1,0 +1,74 @@
+package com.lyncan.opus.Repositories
+
+import com.lyncan.opus.DAOs.AttendanceDAO
+import com.lyncan.opus.DAOs.SubjectDAO
+import com.lyncan.opus.DAOs.TimeTableDAO
+import com.lyncan.opus.data.Subject
+import com.lyncan.opus.entities.AttendanceEntity
+import com.lyncan.opus.entities.SubjectEntity
+import com.lyncan.opus.entities.TimeTableEntity
+
+class SubjectRepository(private val subjectDAO: SubjectDAO ) {
+    fun getAllSubjects() = subjectDAO.getAllSubjects()
+
+
+    suspend fun insert(subject: SubjectEntity) {
+        subjectDAO.insertSubject(subject)
+    }
+
+    suspend fun getSubjectById(subjectId: Int): SubjectEntity? {
+        return subjectDAO.getSubjectById(subjectId)
+    }
+    suspend fun update(subject: SubjectEntity) {
+        subjectDAO.updateSubject(subject)
+    }
+    suspend fun delete(subject: SubjectEntity) {
+        subjectDAO.deleteSubject(subject)
+    }
+
+    suspend fun replaceAll(subjects: List<Subject>) {
+        subjectDAO.deleteAll()
+        insertAll(subjects)
+    }
+
+    suspend fun insertAll(subjects: List<Subject>) {
+        subjects.forEach { subjectDAO.insertSubject(SubjectEntity(it.subject_id!!, name = it.Subject_name, code = it.subject_code,
+            type = it.type)) }
+    }
+}
+
+class AttendanceRepository(private val attendanceDao: AttendanceDAO) {
+    fun getAttendanceBySubject(subjectId: Int) = attendanceDao.getAttendanceBySubject(subjectId)
+    fun getALl() = attendanceDao.getAllAttendance()
+    suspend fun insert(attendance: AttendanceEntity){
+        attendanceDao.insertAttendance(attendance)
+    }
+    suspend fun update(attendance: AttendanceEntity){
+        attendanceDao.updateAttendance(attendance)
+    }
+    suspend fun delete(attendance: AttendanceEntity){
+        attendanceDao.deleteAttendance(attendance)
+    }
+}
+
+class TimeTableRepository(private val timeTableDAO: TimeTableDAO) {
+    fun getAllTimeTableEntries() = timeTableDAO.getAllTimeTable()
+
+    suspend fun getTimeTableByDay(day: String) = timeTableDAO.getTimetableByDay(day)
+
+    suspend fun getTimeTableById(timetableId: Int): TimeTableEntity? {
+        return timeTableDAO.getTimeTableById(timetableId)
+    }
+
+    suspend fun insert(entry: TimeTableEntity) {
+        timeTableDAO.insertTimeTable(entry)
+    }
+
+    suspend fun update(entry: TimeTableEntity) {
+        timeTableDAO.updateTimetable(entry)
+    }
+
+    suspend fun delete(entry: TimeTableEntity) {
+        timeTableDAO.deleteTimetable(entry)
+    }
+}

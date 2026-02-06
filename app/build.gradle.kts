@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)   // 👈 THIS LINE
     kotlin("plugin.serialization") version "1.9.10"
     kotlin("kapt")
     id("kotlinx-serialization")
@@ -129,5 +130,10 @@ dependencies {
 
     //ML Kit Barcode for scanning
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
+    // RoomDB
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
 }

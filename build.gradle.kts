@@ -5,5 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
     id("com.google.dagger.hilt.android") version "2.51.1" apply false // Use the latest version
+    alias(libs.plugins.ksp) apply false
 
 }

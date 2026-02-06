@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,6 +37,13 @@ fun SubjectManagement(navController: NavController, mainViewModel: MainViewModel
     val loading = viewModel.loading.collectAsState()
     val subjects = viewModel.subjects.collectAsState()
     val addSubject = remember { mutableStateOf(false) }
+    val update = remember { mutableStateOf(false) }
+    val subjectName = remember { mutableStateOf("") }
+    val subjectCode = remember { mutableStateOf("") }
+
+
+    val selectedIndex = remember { mutableIntStateOf(0) }
+
     viewModel.subMan.subjectList.forEach { subject, assignment ->
         totalAss.value += assignment.size
     }
@@ -68,13 +76,22 @@ fun SubjectManagement(navController: NavController, mainViewModel: MainViewModel
             .fillMaxSize()
             .statusBarsPadding()) {
             Header()
-            SubjectList(subjects, {subId ->  viewModel.deltFunc(subId) }, addSubject,
+            SubjectList(
+                subjects, { subId -> viewModel.deltFunc(subId) }, addSubject,
 
-                { subjectName, subjectCode -> viewModel.createSubject(subjectName, subjectCode) })
-//            if(!addSubject.value){
-                AddSubject(addSubject)
-//            }
-//            Stats(viewModel.subMan.subjectList.size, totalAss.value)
+                { subjectName, subjectCode, type ->
+                    viewModel.createSubject(
+                        subjectName,
+                        subjectCode,
+                        type
+                    )
+                }, update = update, subjectName = subjectName, subjectCode = subjectCode,
+                selectedIndex = selectedIndex
+            )
+            if(!addSubject.value){
+                AddSubject(addSubject, update,
+                    subjectCode, subjectName, selectedIndex)
+            }
         }
     }else{
         Column(modifier= Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {

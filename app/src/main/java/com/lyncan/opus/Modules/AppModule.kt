@@ -1,11 +1,14 @@
 package com.lyncan.opus.Modules
 
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.UserState
+import android.content.Context
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SubjectRepository
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.UserState
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -18,11 +21,17 @@ object AppModule{
     @Singleton
     fun provideSubjectManagement(
         repository: SupabaseRepository,
-        userState: UserState
+        userState: UserState,
+        subRepo: SubjectRepository,
+        @ApplicationContext context: Context,
+        subdb: SubjectRepository
     ): SubjectManagement {
         return SubjectManagement(
             repo = repository,
-            userState = userState
+            userState = userState,
+            subRepo = subRepo,
+            context,
+            subdb
         )
     }
 

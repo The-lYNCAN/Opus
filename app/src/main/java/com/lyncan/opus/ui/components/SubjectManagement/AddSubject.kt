@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -28,7 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColumnScope.AddSubject(addSubject: MutableState<Boolean>){
+fun ColumnScope.AddSubject(
+    addSubject: MutableState<Boolean>,
+    update: MutableState<Boolean>,
+    subjectCode: MutableState<String>,
+    subjectName: MutableState<String>,
+    selectedIndex: MutableIntState
+){
     Box(modifier = Modifier
         .drawBehind {
             val strokeWidth = 2.dp.toPx()
@@ -54,6 +61,10 @@ fun ColumnScope.AddSubject(addSubject: MutableState<Boolean>){
     ){
         Button(modifier = Modifier.fillMaxWidth().heightIn(min = 70.dp).background(Color(0xFF4F39F6), shape = RoundedCornerShape(10.dp)),
             onClick = {
+                subjectName.value = ""
+                subjectCode.value = ""
+                selectedIndex.value = 0
+                update.value = false
                 addSubject.value = true
             },
             colors = ButtonDefaults.buttonColors(

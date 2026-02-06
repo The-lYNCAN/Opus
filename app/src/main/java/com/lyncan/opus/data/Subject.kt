@@ -8,5 +8,7 @@ data class Subject(
 //    val createdAt: Timestamp,
     val subjectPic: String? = null,
     val Subject_name: String,
-    val group_id: Int
+    val group_id: Int,
+    val subject_code: String? = null,
+    val type: Int = 0
 )

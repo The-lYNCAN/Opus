@@ -1,5 +1,6 @@
 package com.lyncan.opus.ui.components.SubjectManagement
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +9,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,18 +27,32 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SubjectForm(addSubject: MutableState<Boolean>, addSubjectFunc: (String, String) -> Unit) {
-    val subjectName = remember { mutableStateOf("") }
-    val subjectCode = remember { mutableStateOf("") }
-    val options = listOf("Lecture", "Lab", "Both")
-    val selectedIndex = remember { mutableIntStateOf(0) }
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp).border(2.dp, Color(0xFF4F39F6), shape = RoundedCornerShape(10.dp))
+fun SubjectForm(
+    addSubject: MutableState<Boolean>,
+    addSubjectFunc: (String, String, Int) -> Unit,
+    listState: LazyListState,
+    itemIndex: Int,
+    subjectName: MutableState<String>,
+    subjectCode: MutableState<String>,
+    options: List<String>,
+    selectedIndex: MutableIntState,
+    update: MutableState<Boolean>,
+    updateFunction: (String, String, Int) -> Unit
+) {
+
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+    Column(modifier = Modifier.imePadding().fillMaxWidth().padding(16.dp).border(2.dp, Color(0xFF4F39F6), shape = RoundedCornerShape(10.dp))
         .background(Color.White)
 
     ) {
@@ -45,7 +64,14 @@ fun SubjectForm(addSubject: MutableState<Boolean>, addSubjectFunc: (String, Stri
                 start = 16.dp,
                 end = 16.dp,
                 bottom = 8.dp
-            ),
+            ).bringIntoViewRequester(bringIntoViewRequester).onFocusEvent{focusState ->
+                if(focusState.isFocused){
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(itemIndex)
+                    }
+                }
+
+            },
             shape = RoundedCornerShape(10.dp),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color(0xFF4F39F6),
@@ -72,23 +98,21 @@ fun SubjectForm(addSubject: MutableState<Boolean>, addSubjectFunc: (String, Stri
         )
         Row (modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
             options.forEachIndexed { index, string ->
-//                SegmentedButton (
-//                    onClick = {
-//                        selectedIndex.intValue = index
-//                    },
-//                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-//                    selected = index == selectedIndex.intValue
-//                ) {
-//                    Text(string)
-//                }
+
                 SegmentedButtons(string, index == selectedIndex.intValue, selectedIndex, index)
             }
         }
         Row(modifier = Modifier.padding(16.dp)) {
             Button(
                 onClick = {
-                    addSubjectFunc(subjectName.value, subjectCode.value)
-                    addSubject.value = false
+                    if(!update.value){
+                        addSubjectFunc(subjectName.value, subjectCode.value, selectedIndex.intValue)
+                        addSubject.value = false
+                    }else{
+                        updateFunction(subjectName.value, subjectCode.value,
+                            selectedIndex.intValue)
+                        addSubject.value = false
+                    }
                 },
                 modifier = Modifier
                     .weight(2f)
@@ -102,7 +126,7 @@ fun SubjectForm(addSubject: MutableState<Boolean>, addSubjectFunc: (String, Stri
                     vertical = 12.dp
                 )
             ) {
-                Text("Add Subject", style = MaterialTheme.typography.titleLarge)
+                Text(if (!update.value) "Add Subject" else "Update Subject", style = MaterialTheme.typography.titleLarge)
             }
             Button(onClick = {
                 addSubject.value = false
@@ -148,7 +172,7 @@ fun RowScope.SegmentedButtons(
         )
     ) {
         Text(
-            text = string,
+            text = string + "${selectedIndex.intValue} and $index",
             maxLines = 1,
             softWrap = false,
             textAlign = TextAlign.Center,

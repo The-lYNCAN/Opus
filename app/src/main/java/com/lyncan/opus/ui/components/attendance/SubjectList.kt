@@ -11,9 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lyncan.opus.viewmodels.AttendanceViewModel
 
 @Composable
-fun SubjectList(navController: NavController) {
+fun SubjectList(navController: NavController, viewModel: AttendanceViewModel) {
     LazyColumn(modifier = Modifier.padding(top = 10.dp)) {
         item{
 

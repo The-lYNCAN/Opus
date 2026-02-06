@@ -2,8 +2,8 @@ package com.lyncan.opus.Modules
 
 import android.content.Context
 import com.lyncan.opus.MyApplication
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.UserState
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.UserState
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

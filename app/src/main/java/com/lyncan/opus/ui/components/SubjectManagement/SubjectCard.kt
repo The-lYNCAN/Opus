@@ -21,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +35,9 @@ import androidx.compose.ui.unit.sp
 import com.lyncan.opus.data.Subject
 
 @Composable
-fun SubjectCard(subjectName: String, noOfAssignments: Int, subject: Subject, deltFunc: ()->Unit = {}){
+fun SubjectCard(noOfAssignments: Int, subject: Subject, deltFunc: ()->Unit = {}, update: MutableState<Boolean>,
+                updateIndex: MutableState<Int>,
+                addSubject: MutableState<Boolean>){
     val shape = RoundedCornerShape(16.dp)
 
     Card(
@@ -60,7 +65,7 @@ fun SubjectCard(subjectName: String, noOfAssignments: Int, subject: Subject, del
             Spacer(modifier = Modifier.width(12.dp))
 
             Text(
-                text = subjectName,
+                text = subject.Subject_name,
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.CenterVertically),
@@ -72,7 +77,11 @@ fun SubjectCard(subjectName: String, noOfAssignments: Int, subject: Subject, del
                 modifier = Modifier.padding(end = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = {
+                    updateIndex.value = subject.subject_id!!
+                    update.value = true
+                    addSubject.value = true
+                }) {
                     Icon(Icons.Default.Edit, contentDescription = null)
                 }
                 IconButton(onClick = deltFunc) {
@@ -86,10 +95,13 @@ fun SubjectCard(subjectName: String, noOfAssignments: Int, subject: Subject, del
 @Preview
 @Composable
 fun SubjectCardPreview(){
-    SubjectCard(subjectName = "Mathematics", noOfAssignments = 5, subject = Subject(
+    SubjectCard(noOfAssignments = 5, subject = Subject(
         subject_id = 1,
         subjectPic = "TODO()",
         Subject_name = "TODO()",
-        group_id = 0
-    ))
+        group_id = 0,
+    ), update = remember { mutableStateOf(false) },
+        updateIndex = remember { mutableStateOf(-1)},
+        addSubject = remember { mutableStateOf(false)}
+    )
 }

@@ -7,29 +7,31 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lyncan.opus.ui.components.attendance.Hero
 import com.lyncan.opus.ui.components.attendance.SubjectList
+import com.lyncan.opus.viewmodels.AttendanceViewModel
 
 @Composable
 fun AttendanceScreen(navController: NavController) {
-    AttendanceUI(navController)
+    val viewModel = hiltViewModel<AttendanceViewModel>()
+    AttendanceUI(navController, viewModel)
 }
 
 @Composable
-fun AttendanceUI(navController: NavController) {
+fun AttendanceUI(navController: NavController, viewModel: AttendanceViewModel) {
     Column(modifier = Modifier.padding(horizontal = 20.dp).safeDrawingPadding().background(Color.White)) {
         Hero()
-        SubjectList(navController)
+        SubjectList(navController, viewModel)
     }
 }
 
-@Preview
-@Composable
-fun AttendancePreview() {
-    val dumNav = NavController(LocalContext.current)
-    AttendanceUI(dumNav)
-}
+//@Preview
+//@Composable
+//fun AttendancePreview() {
+//    val viewModel = hiltViewModel<AttendanceViewModel>()
+//    val dumNav = NavController(LocalContext.current)
+//    AttendanceUI(dumNav, viewModel)
+//}

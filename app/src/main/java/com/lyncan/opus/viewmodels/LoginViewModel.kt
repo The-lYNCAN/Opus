@@ -15,7 +15,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.lyncan.opus.MyApplication
-import com.lyncan.opus.UserState
+import com.lyncan.opus.Repositories.UserState
 import com.lyncan.opus.data.user
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential

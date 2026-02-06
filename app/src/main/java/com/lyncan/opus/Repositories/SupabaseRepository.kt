@@ -1,4 +1,4 @@
-package com.lyncan.opus.Modules
+package com.lyncan.opus.Repositories
 
 import android.content.Context
 import android.net.Uri
@@ -115,7 +115,8 @@ class SupabaseRepository @Inject constructor(
                 description = description,
                 group_banner = "",
                 admin = supabaseClient.auth.currentUserOrNull()!!.id,
-                invite_code = generateRandomAlphabetString(8)
+                invite_code = generateRandomAlphabetString(8),
+                updated_at = System.currentTimeMillis().toString()
             ),
         ){
             select()

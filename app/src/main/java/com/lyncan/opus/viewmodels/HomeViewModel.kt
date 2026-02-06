@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyncan.opus.MyApplication
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.Modules.SupabaseRepository
-import com.lyncan.opus.UserState
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.UserState
 import com.lyncan.opus.data.Assignment
 import com.lyncan.opus.data.Subject
 import com.lyncan.opus.data.Uploads
@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(val repo: SupabaseRepository,
         viewModelScope.launch {
             user.value = userState.getUser()
             Log.d("User Details from HomeViewModel", userState.getUser().toString())
-            subjectManagement.Retrieve()
+//            subjectManagement.Retrieve()
             details.value = Pair(emptyMap(), emptyMap())
             Log.d("HomeViewModel", "Subjects retrieved: ${subjectManagement.getAllSubjects().size}")
             progressDets.value = subjectManagement.retrieveProgressHome()

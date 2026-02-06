@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.lyncan.opus.SubjectManagement
-import com.lyncan.opus.Modules.SupabaseRepository
+import com.lyncan.opus.Repositories.SubjectManagement
+import com.lyncan.opus.Repositories.SupabaseRepository
 import com.lyncan.opus.data.Subject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.storage.UploadStatus
