@@ -10,10 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.lyncan.opus.ui.components.markAttendance.Card
 import com.lyncan.opus.viewmodels.AttendanceViewModel
-import com.lyncan.opus.viewmodels.MarkAttendanceViewModel
 
 @Composable
 fun MarkAttendanceScreen(viewModel: AttendanceViewModel) {
@@ -27,6 +25,7 @@ fun MarkAttendanceScreen(viewModel: AttendanceViewModel) {
         attendanceItems.value.forEach {
             Card(it, { viewModel.attendedFunc(it.attendance.id) },
                 { viewModel.bunkedFunc(it.attendance.id) })
+            // commit some small change
         }
     }
 }
