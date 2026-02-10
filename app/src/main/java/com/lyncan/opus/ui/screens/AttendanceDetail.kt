@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lyncan.opus.data.AttendanceItem
-import com.lyncan.opus.ui.components.AttendanceDetail.AttendanceHistoryCard
-import com.lyncan.opus.ui.components.AttendanceDetail.TopSection
+import com.lyncan.opus.ui.components.attendanceDetail.AttendanceHistoryCard
+import com.lyncan.opus.ui.components.attendanceDetail.TopSection
 
 @Composable
 fun AttendanceDetailScreen(subjectId: Int?) {

@@ -31,8 +31,7 @@ class MarkAttendanceViewModel @Inject constructor(
     private val timetableRepo: TimeTableRepository,
     val subjectRepo: SubjectRepository
 ): ViewModel() {
-    private val _attendanceItems = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
-    val attendanceItems = _attendanceItems
+
     val mList = mutableListOf<AttendanceEntity>()
     val dayMap = mapOf(
         java.time.DayOfWeek.MONDAY to "MON",
@@ -44,35 +43,11 @@ class MarkAttendanceViewModel @Inject constructor(
         java.time.DayOfWeek.SUNDAY to "SUN"
     )
     init {
-        viewModelScope.launch {
-            val today = LocalDate.now(ZoneId.systemDefault())
-            val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
 
-            val timetableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
-            val attendanceForToday =
-                attendanceRepository.getTodaysAttendance(today.toString()).first()
-
-            val uiItems = attendanceForToday
-                .filter { att ->
-                    val endTime = timetableEntries
-                        .firstOrNull { it.id == att.timeTableId }
-                        ?.endTime
-                        ?.toLocalTime()
-
-                    endTime != null &&
-                            endTime < LocalTime.now() &&
-                            att.isPresent == null
-                }
-                .map { att ->
-                    val subject = subjectRepo.getSubjectById(att.subjectId)
-                    AttendanceUiModel(att, subject!!)
-                }
-
-            _attendanceItems.value = uiItems
-        }
     }
 
     suspend fun getSubjectById(id: Int) = subjectRepo.getSubjectById(id)
+
 
 }
 

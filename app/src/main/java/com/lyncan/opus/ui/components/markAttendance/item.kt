@@ -1,4 +1,4 @@
-package com.lyncan.opus.ui.components.AttendanceDetail
+package com.lyncan.opus.ui.components.markAttendance
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
@@ -23,14 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lyncan.opus.data.AttendanceItem
+import com.lyncan.opus.data.AttendanceUiModel
+//import com.lyncan.opus.ui.components.attendanceDetail.StatusChip
 
 @Composable
-fun AttendanceHistoryCard(item: AttendanceItem) {
-
-    val bgColor = if (item.present) Color(0xFFEFFFF4) else Color(0xFFFFEEEE)
-    val borderColor = if (item.present) Color(0xFF9AFFB3) else Color(0xFFFFB3B3)
-    val statusColor = if (item.present) Color(0xFF00C853) else Color(0xFFFF1744)
+fun Card(item: AttendanceUiModel, attendedFunc: () -> Unit, bunkFunc: () -> Unit) {
+    val bgColor = if (item.attendance.isPresent != null) Color(0xFF1F3A5F) else Color(0xFFFFEEEE)
+    val borderColor = if (item.attendance.isPresent != null) Color(0xFF9AFFB3) else Color(0xFFFFB3B3)
+    val statusColor = if (item.attendance.isPresent != null) Color(0xFF00C853) else Color(0xFFFF1744)
 
     Box(
         modifier = Modifier
@@ -46,17 +47,21 @@ fun AttendanceHistoryCard(item: AttendanceItem) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.date, fontWeight = FontWeight.Bold)
-                Text(item.time, fontSize = 12.sp, color = Color.Gray)
+                Text(item.subject.name, fontWeight = FontWeight.Bold)
+                Text(item.attendance.date, fontSize = 12.sp, color = Color.Gray)
             }
 
-            StatusChip(item.present)
+//            StatusChip(item.attendance.isPresent ?: false)
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = { }) {
+            IconButton(onClick = attendedFunc) {
+                Icon(Icons.Default.Check, contentDescription = null)
+            }
+            IconButton(onClick = bunkFunc) {
                 Icon(Icons.Default.Edit, contentDescription = null)
             }
+
         }
     }
 }

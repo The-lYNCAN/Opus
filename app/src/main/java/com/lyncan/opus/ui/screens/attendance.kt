@@ -22,7 +22,7 @@ fun AttendanceScreen(navController: NavController) {
     if(marked.value){
         AttendanceUI(navController, viewModel)
     }else{
-        MarkAttendanceScreen()
+        MarkAttendanceScreen(viewModel)
     }
 }
 

@@ -1,4 +1,4 @@
-package com.lyncan.opus.ui.components.markAttendance
+package com.lyncan.opus.ui.components.attendanceDetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,14 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lyncan.opus.data.AttendanceUiModel
-import com.lyncan.opus.ui.components.AttendanceDetail.StatusChip
+import com.lyncan.opus.data.AttendanceItem
 
 @Composable
-fun Card(item: AttendanceUiModel) {
-    val bgColor = if (item.attendance.isPresent != null) Color(0xFFEFFFF4) else Color(0xFFFFEEEE)
-    val borderColor = if (item.attendance.isPresent != null) Color(0xFF9AFFB3) else Color(0xFFFFB3B3)
-    val statusColor = if (item.attendance.isPresent != null) Color(0xFF00C853) else Color(0xFFFF1744)
+fun AttendanceHistoryCard(item: AttendanceItem) {
+
+    val bgColor = if (item.present) Color(0xFFEFFFF4) else Color(0xFFFFEEEE)
+    val borderColor = if (item.present) Color(0xFF9AFFB3) else Color(0xFFFFB3B3)
+    val statusColor = if (item.present) Color(0xFF00C853) else Color(0xFFFF1744)
 
     Box(
         modifier = Modifier
@@ -46,11 +46,11 @@ fun Card(item: AttendanceUiModel) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.subject.name, fontWeight = FontWeight.Bold)
-                Text(item.attendance.date, fontSize = 12.sp, color = Color.Gray)
+                Text(item.date, fontWeight = FontWeight.Bold)
+                Text(item.time, fontSize = 12.sp, color = Color.Gray)
             }
 
-            StatusChip(item.attendance.isPresent ?: false)
+            StatusChip(item.present)
 
             Spacer(modifier = Modifier.width(8.dp))
 

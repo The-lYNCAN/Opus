@@ -1,4 +1,4 @@
-package com.lyncan.opus.ui.components.AttendanceDetail
+package com.lyncan.opus.ui.components.attendanceDetail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

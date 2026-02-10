@@ -12,18 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lyncan.opus.ui.components.markAttendance.Card
+import com.lyncan.opus.viewmodels.AttendanceViewModel
 import com.lyncan.opus.viewmodels.MarkAttendanceViewModel
 
 @Composable
-fun MarkAttendanceScreen() {
-    val viewModel = hiltViewModel<MarkAttendanceViewModel>()
+fun MarkAttendanceScreen(viewModel: AttendanceViewModel) {
+//    val viewModel = hiltViewModel<MarkAttendanceViewModel>()
+    viewModel.retrieve()
     val attendanceItems = viewModel.attendanceItems.collectAsState()
     Column(modifier = Modifier
         .statusBarsPadding()
         .fillMaxSize()) {
         Text("Mark Attendance", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.headlineMedium)
         attendanceItems.value.forEach {
-            Card(it)
+            Card(it, { viewModel.attendedFunc(it.attendance.id) },
+                { viewModel.bunkedFunc(it.attendance.id) })
         }
     }
 }

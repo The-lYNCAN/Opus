@@ -38,47 +38,39 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
     }
 
     fun getAllData(): Pair<Map<Subject, List<Assignment>>, Map<Assignment, List<Uploads>>> {
-        Log.d("subjectManagement", "Getting all data: ${subjectList.size} subjects and ${uploadList.size} uploads")
         return Pair(subjectList, uploadList)
     }
     suspend fun Retrieve(){
         val prefs = context.getSharedPreferences("SubjectManagementPrefs", Context.MODE_PRIVATE)
         val lastRetrieved = prefs.getLong("lastRetrieved", 0L)
 
-
         repo.database().from("Group").select {
             filter {
                 eq("group_id", userState.getUser().group_id ?: -1)
             }
         }.decodeSingleOrNull<Groups>().also { it ->
-            val time = it!!.updated_at!!.toLong()
-            if (time > lastRetrieved){
-                repo.database().from("sujet").select {
-                    filter {
-                        eq("group_id", userState.getUser().group_id?:-1)
+            if(it != null){
+                val time = it!!.updated_at!!.toLong()
+                if (time > lastRetrieved){
+                    repo.database().from("sujet").select {
+                        filter {
+                            eq("group_id", userState.getUser().group_id?:-1)
+                        }
+                    }.decodeList<Subject>().also { subjects ->
+                        subRepo.replaceAll(subjects)
+                        prefs.edit {
+                            putLong(
+                                "lastRetrieved",
+                                Clock.System.now().toEpochMilliseconds()
+                            )
+                        }
                     }
-                }.decodeList<Subject>().also { subjects ->
-//                    subjects.forEach { subject ->
-////                        addSubjectWithAssignments(subject, repo.getAssignments(subject.subject_id!!))
-////                        repo.getAssignments(subject.subject_id!!).forEach { assignment ->
-////                            Log.d("Subject Management, checking if 3 occurs in assignments as assid", assignment.assignment_id.toString())
-////                            uploadList[assignment] = repo.getUploads(assignment.assignment_id!!)
-////                        }
-////                        subRepo.replaceAll(subject)
-//                    }
-                    subRepo.replaceAll(subjects)
-                    prefs.edit {
-                        putLong(
-                            "lastRetrieved",
-                            Clock.System.now().toEpochMilliseconds()
-                        )
-                    }
-                    Log.d("SubjectManagement", "Data retrieved and local DB updated. Last retrieved time updated to ${Clock.System.now().toEpochMilliseconds()}")
+                }else{
                 }
-            }else{
-                Log.d("SubjectManagement", "Data is up to date. No retrieval needed. Last retrieved time: $lastRetrieved, Group updated_at: $time")
             }
-        }
+            }
+
+
 
 
 

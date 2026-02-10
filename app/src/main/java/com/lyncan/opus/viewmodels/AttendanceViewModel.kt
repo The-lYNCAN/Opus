@@ -7,6 +7,7 @@ import com.lyncan.opus.Repositories.AttendanceRepository
 import com.lyncan.opus.Repositories.SubjectManagement
 import com.lyncan.opus.Repositories.SubjectRepository
 import com.lyncan.opus.Repositories.TimeTableRepository
+import com.lyncan.opus.data.AttendanceUiModel
 import com.lyncan.opus.entities.AttendanceEntity
 import com.lyncan.opus.viewmodels.Components.toLocalTime
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -28,7 +30,8 @@ class AttendanceViewModel @Inject constructor(
 
     private val _mark = MutableStateFlow<Boolean>(true)
     val mark = _mark
-
+    private val _attendanceItems = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
+    val attendanceItems = _attendanceItems
     suspend fun getSubjectById(id: Int) = subjectRepository.getSubjectById(id)
     fun getAllSubjects() = subjectRepository.getAllSubjects()
     fun getAllAttendance() = attendanceRepository.getALl()
@@ -56,14 +59,70 @@ class AttendanceViewModel @Inject constructor(
                 }
             }
             val attendance = attendanceRepository.getTodaysAttendance(today.toString())
-            attendance.first().forEach {att ->
-                val attendanceTime = timeTableEntries.firstOrNull{it.id == att.timeTableId}?.endTime
-                if (attendanceTime != null && attendanceTime.toLocalTime() < java.time.LocalTime.now()){
-                    if (att.isPresent == false || att.isPresent == null){
-                        mark.value = false
+            attendance.collect {
+                it.forEach { att ->
+                    val attendanceTime = timeTableEntries.firstOrNull{it.id == att.timeTableId}?.endTime
+                    if (attendanceTime != null && attendanceTime.toLocalTime() < java.time.LocalTime.now()){
+                        if (att.isPresent == false || att.isPresent == null){
+                            mark.value = false
+                        }
                     }
+
                 }
             }
         }
     }
+
+    fun retrieve(){
+        viewModelScope.launch {
+            val today = LocalDate.now(ZoneId.systemDefault())
+            val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
+
+            val timetableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
+            val attendanceForToday =
+                attendanceRepository.getTodaysAttendance(today.toString()).first()
+
+            val uiItems = attendanceForToday
+                .filter { att ->
+                    val endTime = timetableEntries
+                        .firstOrNull { it.id == att.timeTableId }
+                        ?.endTime
+                        ?.toLocalTime()
+
+                    endTime != null &&
+                            endTime < LocalTime.now() &&
+                            att.isPresent == null
+                }
+                .map { att ->
+                    val subject = subjectRepository.getSubjectById(att.subjectId)
+                    AttendanceUiModel(att, subject!!)
+                }
+
+            _attendanceItems.value = uiItems
+        }
+    }
+    fun attendedFunc(id: Int){
+        viewModelScope.launch {
+            val today = java.time.LocalDate.now(ZoneId.systemDefault())
+
+            attendanceRepository.markPresent(id)
+            if(attendanceRepository.getTodaysAttendance(today.toString()).first().firstOrNull{it.isPresent == null} == null){
+                mark.value = true
+            }
+
+        }
+    }
+
+    fun bunkedFunc(id: Int){
+
+        viewModelScope.launch {
+            val today = java.time.LocalDate.now(ZoneId.systemDefault())
+
+            attendanceRepository.markAbsent(id)
+            if(attendanceRepository.getTodaysAttendance(today.toString()).first().firstOrNull{it.isPresent == null} == null){
+                mark.value = true
+            }
+        }
+    }
+
 }

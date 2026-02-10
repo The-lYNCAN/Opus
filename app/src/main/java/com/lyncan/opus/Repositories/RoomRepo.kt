@@ -42,6 +42,16 @@ class SubjectRepository(private val subjectDAO: SubjectDAO ) {
 
 class AttendanceRepository(private val attendanceDao: AttendanceDAO) {
     fun getAttendanceBySubject(subjectId: Int) = attendanceDao.getAttendanceBySubject(subjectId)
+
+    suspend fun markPresent(id: Int){
+        val gett = attendanceDao.getAttendanceById(id).first()[0].copy(isPresent = true)
+        attendanceDao.updateAttendance(gett)
+    }
+    suspend fun markAbsent(id: Int){
+        val gett = attendanceDao.getAttendanceById(id).first()[0].copy(isPresent = false)
+        attendanceDao.updateAttendance(gett)
+    }
+
     fun getALl() = attendanceDao.getAllAttendance()
     suspend fun insert(attendance: AttendanceEntity){
         Log.d("AttendanceRepository", "Inserting attendance: $attendance")
