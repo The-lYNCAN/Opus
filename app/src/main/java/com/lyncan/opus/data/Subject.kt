@@ -10,5 +10,5 @@ data class Subject(
     val Subject_name: String,
     val group_id: Int,
     val subject_code: String? = null,
-    val type: Int = 0
+    val type: Int
 )

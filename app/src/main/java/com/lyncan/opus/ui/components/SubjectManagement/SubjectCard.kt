@@ -100,6 +100,7 @@ fun SubjectCardPreview(){
         subjectPic = "TODO()",
         Subject_name = "TODO()",
         group_id = 0,
+        type = 0
     ), update = remember { mutableStateOf(false) },
         updateIndex = remember { mutableStateOf(-1)},
         addSubject = remember { mutableStateOf(false)}

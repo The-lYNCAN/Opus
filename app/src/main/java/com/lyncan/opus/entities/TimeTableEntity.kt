@@ -17,10 +17,11 @@ import androidx.room.PrimaryKey
 data class TimeTableEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String,
-    val code: String? = null,
     val subjectid: Int,
     val day: String,
     val startTime: String,
-    val endTime: String
+    val endTime: String,
+    val type: Int = 0,
+    val room: String? = "Home",
+    val group: Int = 0
 )

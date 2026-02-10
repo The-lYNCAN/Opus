@@ -41,7 +41,7 @@ class SubjectManagementViewModel @Inject constructor(val subjectManage: SubjectM
     fun createSubject(subjectName: String, subjectCode: String?, type: Int){
         viewModelScope.launch {
             loading.value = true
-
+            Log.d("SubjectManagementVM", "Creating subject with name: $subjectName, code: $subjectCode, type: $type")
             subMan.createSubject(subjectName, subjectCode, type)
             loading.value = false
         }

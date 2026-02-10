@@ -1,5 +1,6 @@
 package com.lyncan.opus.Repositories
 
+import android.util.Log
 import com.lyncan.opus.DAOs.AttendanceDAO
 import com.lyncan.opus.DAOs.SubjectDAO
 import com.lyncan.opus.DAOs.TimeTableDAO
@@ -7,6 +8,8 @@ import com.lyncan.opus.data.Subject
 import com.lyncan.opus.entities.AttendanceEntity
 import com.lyncan.opus.entities.SubjectEntity
 import com.lyncan.opus.entities.TimeTableEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class SubjectRepository(private val subjectDAO: SubjectDAO ) {
     fun getAllSubjects() = subjectDAO.getAllSubjects()
@@ -41,6 +44,7 @@ class AttendanceRepository(private val attendanceDao: AttendanceDAO) {
     fun getAttendanceBySubject(subjectId: Int) = attendanceDao.getAttendanceBySubject(subjectId)
     fun getALl() = attendanceDao.getAllAttendance()
     suspend fun insert(attendance: AttendanceEntity){
+        Log.d("AttendanceRepository", "Inserting attendance: $attendance")
         attendanceDao.insertAttendance(attendance)
     }
     suspend fun update(attendance: AttendanceEntity){
@@ -49,6 +53,21 @@ class AttendanceRepository(private val attendanceDao: AttendanceDAO) {
     suspend fun delete(attendance: AttendanceEntity){
         attendanceDao.deleteAttendance(attendance)
     }
+    suspend fun attendancePresent(
+        date: String,
+        timeTableId: Int
+    ): Boolean {
+        return getALl()
+            .first()   // ⬅️ take ONE emission
+            .any { attendance ->
+                attendance.date == date &&
+                        attendance.timeTableId == timeTableId
+            }
+    }
+    fun getTodaysAttendance(date: String): Flow<List<AttendanceEntity>> {
+        return attendanceDao.getAttendanceByDate(date)
+    }
+
 }
 
 class TimeTableRepository(private val timeTableDAO: TimeTableDAO) {

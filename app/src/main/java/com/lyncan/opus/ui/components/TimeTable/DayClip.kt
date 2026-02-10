@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DayChip(day: String, selected: Boolean, onClick: () -> Unit) {
+fun DayChip(day: String, selected: Boolean, onClick: () -> Unit, total: Int) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
@@ -31,7 +31,7 @@ fun DayChip(day: String, selected: Boolean, onClick: () -> Unit) {
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "4 classes",
+            text = "$total classes",
             fontSize = 12.sp,
             color = if (selected) Color.White else Color.Gray
         )

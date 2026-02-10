@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -17,7 +18,12 @@ import com.lyncan.opus.viewmodels.AttendanceViewModel
 @Composable
 fun AttendanceScreen(navController: NavController) {
     val viewModel = hiltViewModel<AttendanceViewModel>()
-    AttendanceUI(navController, viewModel)
+    val marked = viewModel.mark.collectAsState()
+    if(marked.value){
+        AttendanceUI(navController, viewModel)
+    }else{
+        MarkAttendanceScreen()
+    }
 }
 
 @Composable

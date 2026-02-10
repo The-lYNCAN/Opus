@@ -28,6 +28,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,22 +42,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.lyncan.opus.entities.TimeTableEntity
+import com.lyncan.opus.viewmodels.TimeTableManagementFormViewModel
 import java.util.Calendar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
-
+fun TimeTableManagementForm(addSubject: MutableState<Boolean>, selectedDay: MutableState<String>) {
+    val viewModel = hiltViewModel<TimeTableManagementFormViewModel>()
     val options = listOf("Lecture", "Lab")
     val selectedType = remember { mutableIntStateOf(0) }
     val selectedGroup = remember { mutableIntStateOf(0) }
-    val subjects = listOf("Mathematics", "Physics", "Data Structures", "OS")
     var expanded by remember { mutableStateOf(false) }
-    var selectedSubject by remember { mutableStateOf("") }
+    var selectedSubject by remember { mutableIntStateOf(0) }
     var startTime by remember { mutableStateOf("03:00 PM") }
     var endTime by remember { mutableStateOf("04:00 PM") }
-
+    val subjects = viewModel.getSubjects().collectAsState(emptyList()) // 🔑 Fetch subjects from ViewModel
+    val room = remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,7 +78,7 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
         ) {
 
             OutlinedTextField(
-                value = selectedSubject,
+                value = subjects.value.firstOrNull { it.id == selectedSubject }?.name ?: "",
                 onValueChange = {},
                 readOnly = true,
                 modifier = Modifier
@@ -96,11 +100,13 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                subjects.forEach { subject ->
+                subjects.value.forEach { subject ->
                     DropdownMenuItem(
-                        text = { Text(subject) },
+                        text = {
+                            Text(subject.name)
+                               },
                         onClick = {
-                            selectedSubject = subject
+                            selectedSubject = subject.id
                             expanded = false
                         }
                     )
@@ -120,11 +126,18 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
 
         // Lecture / Lab
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            val subjectType = subjects.value.firstOrNull { it.id == selectedSubject }?.type ?: -1
             options.forEachIndexed { index, text ->
+                val enabledForOption = when (index) {
+                    0 -> subjectType == 0 || subjectType == 2 // Lecture allowed for lecture-only or both
+                    1 -> subjectType == 1 || subjectType == 2 // Lab allowed for lab-only or both
+                    else -> false
+                }
                 SegmentedButtonStyled(
                     text = text,
                     selected = selectedType.intValue == index,
-                    onClick = { selectedType.intValue = index }
+                    onClick = { selectedType.intValue = index },
+                    enabled = enabledForOption
                 )
             }
         }
@@ -133,8 +146,8 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
 
         // Room
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = room.value,
+            onValueChange = {room.value = it},
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             placeholder = { Text("Room (e.g., A101)") },
@@ -153,7 +166,8 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
                 SegmentedButtonStyled(
                     text = text,
                     selected = selectedGroup.intValue == index,
-                    onClick = { selectedGroup.intValue = index }
+                    onClick = { selectedGroup.intValue = index },
+                    enabled = true // Only enable group selection for Lectures
                 )
             }
         }
@@ -163,10 +177,22 @@ fun TimeTableManagementForm(addSubject: MutableState<Boolean>) {
         // Bottom Buttons
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(
-                onClick = { addSubject.value = false },
+                onClick = {
+                    viewModel.addTimeTable(TimeTableEntity(
+                        subjectid = selectedSubject,
+                        day = selectedDay.value,
+                        startTime = startTime,
+                        endTime = endTime,
+                        type = selectedType.intValue,
+                        room = room.value,
+                        group = selectedGroup.intValue
+                    ))
+                    addSubject.value = false
+                          },
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp),
+                enabled = selectedSubject != 0 ,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F39F6))
             ) {
@@ -229,8 +255,15 @@ fun RowScope.TimeBox(label: String,
 fun RowScope.SegmentedButtonStyled(
     text: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean
 ) {
+    val isEnabled = remember { mutableStateOf(false) }
+    if (text == "Lab") {
+        isEnabled.value = enabled
+    } else {
+        isEnabled.value = true
+    }
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -239,7 +272,8 @@ fun RowScope.SegmentedButtonStyled(
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (selected) Color(0xFF4F39F6) else Color(0xFFF3F4F6)
-        )
+        ),
+        enabled = isEnabled.value
     ) {
         Text(
             text = text,
@@ -284,5 +318,5 @@ fun RowScope.SegmentedButtons(
 @Preview
 @Composable
 fun ManagementPreview(){
-    TimeTableManagementForm(addSubject = remember { mutableStateOf(true) })
+    TimeTableManagementForm(addSubject = remember { mutableStateOf(true)}, selectedDay = remember { mutableStateOf("Monday") })
 }

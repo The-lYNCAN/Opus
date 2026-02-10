@@ -121,6 +121,7 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
     }
 
     suspend fun createSubject(subjectName: String, subjectCode: String?, type: Int): Subject? {
+        Log.d("SubjectManagement", "Creating subject with name: $subjectName, code: $subjectCode, type: $type")
         val user = userState.getUser()
         val newSubject = Subject(
             Subject_name = subjectName,

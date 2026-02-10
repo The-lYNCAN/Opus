@@ -83,7 +83,7 @@ fun ColumnScope.SubjectList(subjects: State<MutableMap<Subject, List<Assignment>
                     item {
                         SubjectCard(
                             0,
-                            subject = Subject(subject_id = it.id, Subject_name = it.name, group_id = viewModel.group_id.value?: -1),
+                            subject = Subject(subject_id = it.id, Subject_name = it.name, group_id = viewModel.group_id.value?: -1, type = it.type),
                             deltFunc = {
                                 deltFunc(it.id)
                             }, update=update,

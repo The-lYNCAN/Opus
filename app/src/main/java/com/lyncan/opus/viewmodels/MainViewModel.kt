@@ -35,7 +35,7 @@ constructor(val repo: SupabaseRepository, val userState: UserState, val subMan: 
             loaded.value = false
             user.value = repo.getCurrentUserDetails()
             userState.setUser(user.value)
-            subMan.Retrieve()
+//            subMan.Retrieve()
             loaded.value = true
             Log.d("MainViewModel", "User details fetched: ${user.value}" )
         }

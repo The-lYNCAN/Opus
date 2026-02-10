@@ -35,6 +35,7 @@ class HomeViewModel @Inject constructor(val repo: SupabaseRepository,
             group_id = -1,
             Subject_name = "No Subjects Found",
             subjectPic = "",
+            type = -1
         ) to listOf(
             Assignment(
                 assignment_id = -1,

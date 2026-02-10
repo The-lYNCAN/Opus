@@ -13,7 +13,7 @@ import com.lyncan.opus.entities.TimeTableEntity
 
 @Database(
     entities = [AttendanceEntity::class, SubjectEntity::class, TimeTableEntity::class],
-    version = 4
+    version = 7
 )
 abstract class AppDatabase: RoomDatabase(){
     abstract fun attendanceDAO(): AttendanceDAO

@@ -17,9 +17,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lyncan.opus.entities.TimeTableEntity
+import java.time.Duration
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+
+fun String.toLocalTime(): LocalTime {
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+    return LocalTime.parse(this.trim(), formatter)
+}
 @Composable
-fun BreakCard() {
+fun BreakCard(entity: TimeTableEntity) {
+    val time = "${entity.startTime} - ${entity.endTime}"
+    val start = entity.startTime.toLocalTime()
+    val end = entity.endTime.toLocalTime()
+    val gap = Duration.between(start, end).toMinutes()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,12 +51,12 @@ fun BreakCard() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                "Break (90 min)",
+                "Break ($gap min)",
                 color = Color(0xFFFF6F00),
                 fontWeight = FontWeight.Bold
             )
             Text(
-                "12:30 PM - 2:00 PM",
+                time,
                 color = Color(0xFFFF6F00),
                 fontSize = 12.sp
             )

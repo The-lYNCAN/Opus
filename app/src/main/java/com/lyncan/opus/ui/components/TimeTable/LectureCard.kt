@@ -1,6 +1,7 @@
 package com.lyncan.opus.ui.components.TimeTable
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +36,8 @@ import androidx.compose.ui.unit.sp
 fun LectureCard(
     color: Color,
     title: String,
-    time: String
+    time: String,
+    onDelete: () -> Unit = {}
 ) {
     val shape = RoundedCornerShape(16.dp)
 
@@ -78,7 +80,10 @@ fun LectureCard(
                     Icon(
                         Icons.Default.Close,
                         contentDescription = null,
-                        tint = Color.White
+                        tint = Color.Black,
+                        modifier = Modifier.clickable{
+                            onDelete()
+                        }
                     )
                 }
 

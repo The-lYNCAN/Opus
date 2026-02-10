@@ -30,10 +30,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lyncan.opus.entities.AttendanceEntity
+import com.lyncan.opus.entities.SubjectEntity
 import com.lyncan.opus.uI.navigation.Route
 
 @Composable
-fun SubjectCard(navController: NavController) {
+fun SubjectCard(navController: NavController, subject: SubjectEntity, attendanceList: List<AttendanceEntity>) {
     val performanceBool = true
     val greenCol = Color(0xFF00b747)
     val orangeCol = Color(0xFFdd9800)

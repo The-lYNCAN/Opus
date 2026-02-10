@@ -20,9 +20,17 @@ interface AttendanceDAO {
     @Query("SELECT * FROM attendance WHERE subjectId = :subjectId")
     fun getAttendanceBySubject(subjectId: Int): Flow<List<AttendanceEntity>>
 
+    @Query("""
+    SELECT * FROM attendance 
+    WHERE date = :date
+    """)
+    fun getAttendanceByDate(date: String): Flow<List<AttendanceEntity>>
+
     @Update
     suspend fun updateAttendance(attendance: AttendanceEntity)
 
     @Delete
     suspend fun deleteAttendance(attendance: AttendanceEntity)
+
+
 }

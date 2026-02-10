@@ -39,6 +39,10 @@ object DatabaseModule {
         database.subjectDAO()
 
     @Provides
+    fun provideTimeTableDao(database: AppDatabase): TimeTableDAO =
+        database.timetableDAO()
+
+    @Provides
     fun provideAttendanceRepository(dao: AttendanceDAO): AttendanceRepository =
         AttendanceRepository(dao)
 
