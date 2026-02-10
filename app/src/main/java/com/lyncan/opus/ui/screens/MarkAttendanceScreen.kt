@@ -25,7 +25,7 @@ fun MarkAttendanceScreen(viewModel: AttendanceViewModel) {
         attendanceItems.value.forEach {
             Card(it, { viewModel.attendedFunc(it.attendance.id) },
                 { viewModel.bunkedFunc(it.attendance.id) })
-            // commit some small change
+            // commit some small change to test commit history
         }
     }
 }
