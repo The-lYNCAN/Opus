@@ -14,5 +14,6 @@ data class Groups(
     val admin: String,
     val description: String? = null,
     val invite_code: String,
-    val updated_at: String? = null
+    val updated_at: String? = null,
+    val time_table_at: String? = null
 )

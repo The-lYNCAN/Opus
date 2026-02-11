@@ -1,4 +1,4 @@
-package com.lyncan.opus.ui.components.attendance
+package com.lyncan.opus.ui.components.Attendance
 
 import android.util.Log
 import androidx.compose.foundation.layout.Spacer

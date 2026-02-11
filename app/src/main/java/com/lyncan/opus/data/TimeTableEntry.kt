@@ -1,7 +1,7 @@
 package com.lyncan.opus.data
 
 data class TimeTableEntry(
-    val id: Int = 0,
+    val id: Int? = 0,
     val subjectid: Int,
     val day: String,
     val startTime: String,

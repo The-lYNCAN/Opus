@@ -63,7 +63,7 @@ class AttendanceViewModel @Inject constructor(
                 it.forEach { att ->
                     val attendanceTime = timeTableEntries.firstOrNull{it.id == att.timeTableId}?.endTime
                     if (attendanceTime != null && attendanceTime.toLocalTime() < java.time.LocalTime.now()){
-                        if (att.isPresent == false || att.isPresent == null){
+                        if (att.isPresent == null){
                             mark.value = false
                         }
                     }

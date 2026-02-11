@@ -5,6 +5,7 @@ import android.net.Uri
 import com.lyncan.opus.data.Assignment
 import com.lyncan.opus.data.Groups
 import com.lyncan.opus.data.Subject
+import com.lyncan.opus.data.TimeTableEntry
 import com.lyncan.opus.data.Uploads
 import com.lyncan.opus.data.user
 import io.github.jan.supabase.SupabaseClient
@@ -196,5 +197,8 @@ class SupabaseRepository @Inject constructor(
         }
     }
 
+    suspend fun createTimeTable(timeTableEntry: TimeTableEntry){
+
+    }
 
 }

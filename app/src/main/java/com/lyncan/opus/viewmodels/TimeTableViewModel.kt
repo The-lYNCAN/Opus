@@ -3,6 +3,7 @@ package com.lyncan.opus.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lyncan.opus.Repositories.SubjectManagement
 import com.lyncan.opus.Repositories.SubjectRepository
 import com.lyncan.opus.Repositories.TimeTableRepository
 import com.lyncan.opus.data.Subject
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TimeTableViewModel @Inject constructor(
     private val timeRepo: TimeTableRepository,
-    private val subjectRepo: SubjectRepository
+    private val subjectRepo: SubjectRepository,
+    private val subMan: SubjectManagement
 ) : ViewModel() {
     fun getTimeTableEntries() = timeRepo.getAllTimeTableEntries()
 
@@ -23,9 +25,10 @@ class TimeTableViewModel @Inject constructor(
 
     fun deleteTimeTableEntry(entry: TimeTableEntity) {
         viewModelScope.launch {
-            val entry = timeRepo.getTimeTableById(entry.id)
-            if (entry != null) {
-                timeRepo.delete(entry)
+            val entryR = timeRepo.getTimeTableById(entry.id)
+            if (entryR != null) {
+                timeRepo.delete(entryR)
+                subMan.deleteTimeTableEntry(entryR.id)
             }
         }
     }

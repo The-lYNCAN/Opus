@@ -1,4 +1,4 @@
-package com.lyncan.opus.ui.components.attendance
+package com.lyncan.opus.ui.components.Attendance
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

@@ -10,6 +10,7 @@ import com.lyncan.opus.entities.SubjectEntity
 import kotlinx.datetime.Clock
 import javax.inject.Inject
 import androidx.core.content.edit
+import com.lyncan.opus.data.TimeTableEntry
 import com.lyncan.opus.data.UpdateSubjectRequest
 import com.lyncan.opus.data.user
 
@@ -50,7 +51,7 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
             }
         }.decodeSingleOrNull<Groups>().also { it ->
             if(it != null){
-                val time = it!!.updated_at!!.toLong()
+                val time = it.updated_at!!.toLong()
                 if (time > lastRetrieved){
                     repo.database().from("sujet").select {
                         filter {
@@ -69,11 +70,6 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
                 }
             }
             }
-
-
-
-
-
     }
     fun retrieveProgressHome(): Pair<Int, Int>{
         var total = 0
@@ -193,6 +189,43 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
                 eq("group_id", groupId)
             }
         }
+    }
+
+    suspend fun updateTimeForTimeTableInGroup(groupId: Int){
+        repo.database().from("Group").update({
+            Groups::time_table_at setTo Clock.System.now().toEpochMilliseconds().toString()
+        }){
+            filter {
+                eq("group_id", groupId)
+            }
+        }
+    }
+
+    suspend fun createTimeTableEntry(timeTableEntry: TimeTableEntry){
+        val group_id = userState.getUser().group_id
+        repo.database().from("timetableentries").insert(
+            TimeTableEntry(
+                group = group_id!!,
+                startTime = timeTableEntry.startTime,
+                endTime = timeTableEntry.endTime,
+                room = timeTableEntry.room,
+                subjectid = timeTableEntry.subjectid,
+                day = timeTableEntry.day,
+                type = timeTableEntry.type,
+            )
+        )
+        updateTimeForTimeTableInGroup(groupId = group_id)
+    }
+
+    suspend fun deleteTimeTableEntry(timeTableEntry: Int){
+        val group_id = userState.getUser().group_id
+        repo.database().from("sujet").delete {
+            select()
+            filter {
+                eq("id", timeTableEntry)
+            }
+        }
+        updateTimeForTimeTableInGroup(groupId = group_id?:-1)
     }
 
 }
