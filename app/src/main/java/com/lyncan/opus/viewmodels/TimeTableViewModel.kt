@@ -1,13 +1,10 @@
 package com.lyncan.opus.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyncan.opus.Repositories.SubjectManagement
 import com.lyncan.opus.Repositories.SubjectRepository
 import com.lyncan.opus.Repositories.TimeTableRepository
-import com.lyncan.opus.data.Subject
-import com.lyncan.opus.entities.SubjectEntity
 import com.lyncan.opus.entities.TimeTableEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

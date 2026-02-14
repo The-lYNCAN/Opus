@@ -4,6 +4,7 @@ import android.content.Context
 import com.lyncan.opus.Repositories.SubjectManagement
 import com.lyncan.opus.Repositories.SubjectRepository
 import com.lyncan.opus.Repositories.SupabaseRepository
+import com.lyncan.opus.Repositories.TimeTableRepository
 import com.lyncan.opus.Repositories.UserState
 import dagger.Module
 import dagger.Provides
@@ -24,14 +25,16 @@ object AppModule{
         userState: UserState,
         subRepo: SubjectRepository,
         @ApplicationContext context: Context,
-        subdb: SubjectRepository
+        subdb: SubjectRepository,
+        ttRepo: TimeTableRepository
     ): SubjectManagement {
         return SubjectManagement(
             repo = repository,
             userState = userState,
             subRepo = subRepo,
             context,
-            subdb
+            subdb,
+            ttRepo
         )
     }
 

@@ -29,4 +29,7 @@ interface TimeTableDAO {
 
     @Query("SELECT * FROM timetable WHERE day = :day ORDER BY startTime ASC")
     suspend fun getTimetableByDay(day: String): List<TimeTableEntity>
+
+    @Query("DELETE FROM timetable")
+    suspend fun deleteAll()
 }

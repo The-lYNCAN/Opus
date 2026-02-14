@@ -5,6 +5,7 @@ import com.lyncan.opus.DAOs.AttendanceDAO
 import com.lyncan.opus.DAOs.SubjectDAO
 import com.lyncan.opus.DAOs.TimeTableDAO
 import com.lyncan.opus.data.Subject
+import com.lyncan.opus.data.TimeTableEntry
 import com.lyncan.opus.entities.AttendanceEntity
 import com.lyncan.opus.entities.SubjectEntity
 import com.lyncan.opus.entities.TimeTableEntity
@@ -99,5 +100,20 @@ class TimeTableRepository(private val timeTableDAO: TimeTableDAO) {
 
     suspend fun delete(entry: TimeTableEntity) {
         timeTableDAO.deleteTimetable(entry)
+    }
+
+    suspend fun replaceAll(entries: List<TimeTableEntry>) {
+        timeTableDAO.deleteAll()
+        entries.forEach { timeTableDAO.insertTimeTable(TimeTableEntity(
+            id = it.id!!,
+            subjectid = it.subjectid,
+            day = it.day,
+            startTime = it.startTime,
+            endTime = it.endTime,
+            type = it.type,
+            room = it.room,
+            group = it.group,
+            editable = true
+        )) }
     }
 }

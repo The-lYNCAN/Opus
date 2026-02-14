@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -35,6 +34,7 @@ class AttendanceViewModel @Inject constructor(
     suspend fun getSubjectById(id: Int) = subjectRepository.getSubjectById(id)
     fun getAllSubjects() = subjectRepository.getAllSubjects()
     fun getAllAttendance() = attendanceRepository.getALl()
+    fun getTT() = timetableRepo.getAllTimeTableEntries()
     val dayMap = mapOf(
         java.time.DayOfWeek.MONDAY to "MON",
         java.time.DayOfWeek.TUESDAY to "TUE",
@@ -51,6 +51,7 @@ class AttendanceViewModel @Inject constructor(
         Log.d("AttendanceViewModel", "Today is: $todayAccordingToDB, ${LocalDate.now(ZoneId.systemDefault())}")
         viewModelScope.launch {
             subMan.Retrieve()
+            subMan.retrieveTimeTable()
             val timeTableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
             timeTableEntries.forEach {
                 val attendanceEnt = AttendanceEntity(subjectId = it.subjectid, date = today.toString(), time = "", isPresent = null, timeTableId = it.id)
@@ -79,26 +80,27 @@ class AttendanceViewModel @Inject constructor(
             val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
 
             val timetableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
-            val attendanceForToday =
-                attendanceRepository.getTodaysAttendance(today.toString()).first()
 
-            val uiItems = attendanceForToday
-                .filter { att ->
-                    val endTime = timetableEntries
-                        .firstOrNull { it.id == att.timeTableId }
-                        ?.endTime
-                        ?.toLocalTime()
+            attendanceRepository.getTodaysAttendance(today.toString()).collect {
+                val uiItems = it
+                    .filter { att ->
+                        val endTime = timetableEntries
+                            .firstOrNull { it.id == att.timeTableId }
+                            ?.endTime
+                            ?.toLocalTime()
 
-                    endTime != null &&
-                            endTime < LocalTime.now() &&
-                            att.isPresent == null
-                }
-                .map { att ->
-                    val subject = subjectRepository.getSubjectById(att.subjectId)
-                    AttendanceUiModel(att, subject!!)
-                }
+                        endTime != null &&
+                                endTime < LocalTime.now() &&
+                                att.isPresent == null
+                    }
+                    .map { att ->
+                        val subject = subjectRepository.getSubjectById(att.subjectId)
+                        AttendanceUiModel(att, subject!!)
+                    }
 
-            _attendanceItems.value = uiItems
+                _attendanceItems.value = uiItems
+            }
+
         }
     }
     fun attendedFunc(id: Int){
@@ -106,8 +108,10 @@ class AttendanceViewModel @Inject constructor(
             val today = java.time.LocalDate.now(ZoneId.systemDefault())
 
             attendanceRepository.markPresent(id)
-            if(attendanceRepository.getTodaysAttendance(today.toString()).first().firstOrNull{it.isPresent == null} == null){
-                mark.value = true
+            attendanceRepository.getTodaysAttendance(today.toString()).collect {
+                if (it.firstOrNull{it.isPresent == null} == null){
+                    mark.value = true
+                }
             }
 
         }

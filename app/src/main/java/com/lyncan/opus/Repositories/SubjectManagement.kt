@@ -2,20 +2,21 @@ package com.lyncan.opus.Repositories
 
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import com.lyncan.opus.data.Assignment
 import com.lyncan.opus.data.Groups
 import com.lyncan.opus.data.Subject
+import com.lyncan.opus.data.TimeTableEntry
+import com.lyncan.opus.data.UpdateSubjectRequest
 import com.lyncan.opus.data.Uploads
 import com.lyncan.opus.entities.SubjectEntity
 import kotlinx.datetime.Clock
 import javax.inject.Inject
-import androidx.core.content.edit
-import com.lyncan.opus.data.TimeTableEntry
-import com.lyncan.opus.data.UpdateSubjectRequest
-import com.lyncan.opus.data.user
 
 class SubjectManagement @Inject constructor(private val repo: SupabaseRepository, val userState: UserState,
-    private val subRepo: SubjectRepository, private val context: Context, private val subdb: SubjectRepository) {
+    private val subRepo: SubjectRepository, private val context: Context, private val subdb: SubjectRepository,
+    private val timeTableRepo: TimeTableRepository
+    ) {
     val subjectList = mutableMapOf<Subject, List<Assignment>>()
     val uploadList = mutableMapOf<Assignment, List<Uploads>>()
     var id = 0
@@ -69,8 +70,42 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
                 }else{
                 }
             }
-            }
+        }
     }
+
+    suspend fun retrieveTimeTable(){
+        val prefs = context.getSharedPreferences("SubjectManagementPrefs", Context.MODE_PRIVATE)
+        val lastRetrieved = prefs.getLong("lastRetrievedTimeTable", 0L)
+
+        repo.database().from("Group").select {
+            filter {
+                eq("group_id", userState.getUser().group_id ?: -1)
+            }
+        }.decodeSingleOrNull<Groups>().also { it ->
+            if(it != null){
+                val time = it.time_table_at!!.toLong()
+                if (time > lastRetrieved){
+                    repo.database().from("timetableentries").select {
+                        filter {
+                            eq("group", userState.getUser().group_id?:-1)
+                        }
+                    }.decodeList<TimeTableEntry>().also { ttEntry ->
+//                        subRepo.replaceAll(subjects)
+                        timeTableRepo.replaceAll(ttEntry)
+                        prefs.edit {
+                            putLong(
+                                "lastRetrievedTimeTable",
+                                Clock.System.now().toEpochMilliseconds()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
     fun retrieveProgressHome(): Pair<Int, Int>{
         var total = 0
         var completed = 0
@@ -201,9 +236,10 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
         }
     }
 
-    suspend fun createTimeTableEntry(timeTableEntry: TimeTableEntry){
+    suspend fun createTimeTableEntry(timeTableEntry: TimeTableEntry): TimeTableEntry?{
         val group_id = userState.getUser().group_id
-        repo.database().from("timetableentries").insert(
+        Log.d("Trying to create time table entry", "Group ID: $group_id, TimeTableEntry: $timeTableEntry")
+        val ttId = repo.database().from("timetableentries").insert(
             TimeTableEntry(
                 group = group_id!!,
                 startTime = timeTableEntry.startTime,
@@ -213,13 +249,21 @@ class SubjectManagement @Inject constructor(private val repo: SupabaseRepository
                 day = timeTableEntry.day,
                 type = timeTableEntry.type,
             )
-        )
+        ){
+            select()
+        }.decodeSingleOrNull<TimeTableEntry>()
+        Log.d("Inserted value:",ttId.toString())
+//        val insertedSubject = repo.database().from("sujet").insert(newSubject){
+//            select()
+//        }.decodeSingleOrNull<Subject>()
         updateTimeForTimeTableInGroup(groupId = group_id)
+        return ttId
     }
 
     suspend fun deleteTimeTableEntry(timeTableEntry: Int){
+        Log.d("Trying to delete time table", "Entry ID: $timeTableEntry")
         val group_id = userState.getUser().group_id
-        repo.database().from("sujet").delete {
+        repo.database().from("timetableentries").delete {
             select()
             filter {
                 eq("id", timeTableEntry)

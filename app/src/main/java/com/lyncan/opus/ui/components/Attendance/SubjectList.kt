@@ -19,12 +19,12 @@ import androidx.navigation.NavController
 import com.lyncan.opus.entities.AttendanceEntity
 import com.lyncan.opus.entities.SubjectEntity
 import com.lyncan.opus.viewmodels.AttendanceViewModel
-import kotlin.collections.emptyList
 
 @Composable
 fun SubjectList(navController: NavController, viewModel: AttendanceViewModel) {
     val attendance = viewModel.getAllAttendance().collectAsState(emptyList())
     val allAttendance = remember { mutableStateOf<Map<SubjectEntity, List<AttendanceEntity>>?>(null) }
+    val tt = viewModel.getTT().collectAsState(emptyList())
     LaunchedEffect(attendance.value) {
         val everything = attendance.value.groupBy { it.subjectId }
         allAttendance.value = everything.mapKeys { entry ->
@@ -43,7 +43,7 @@ fun SubjectList(navController: NavController, viewModel: AttendanceViewModel) {
         allAttendance.value?.forEach { subject, attendanceList ->
 //                SubjectCard(subject, attendanceList, navController)
             item{
-                SubjectCard(navController, subject, attendanceList)
+                SubjectCard(navController, subject, attendanceList, tt)
             }
         }
 

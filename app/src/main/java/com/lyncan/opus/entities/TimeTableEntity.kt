@@ -23,5 +23,7 @@ data class TimeTableEntity(
     val endTime: String,
     val type: Int = 0,
     val room: String? = "Home",
-    val group: Int = 0
+    val group: Int = 0,
+    val editable: Boolean = true,
+    val holiday: Boolean = false
 )

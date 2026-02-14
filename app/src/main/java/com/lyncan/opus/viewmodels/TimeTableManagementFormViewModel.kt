@@ -1,7 +1,6 @@
 package com.lyncan.opus.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyncan.opus.Repositories.SubjectManagement
@@ -30,9 +29,9 @@ class TimeTableManagementFormViewModel @Inject constructor(
     }
 
     fun addTimeTable(timeEntry: TimeTableEntity) {
+        Log.d("TimeTableManagementFormViewModel", "Adding TimeTableEntry: $timeEntry")
         viewModelScope.launch {
-            timeRepo.insert(timeEntry)
-            subMan.createTimeTableEntry(TimeTableEntry(
+            val id = subMan.createTimeTableEntry(TimeTableEntry(
                 subjectid = timeEntry.subjectid,
                 day = timeEntry.day,
                 startTime = timeEntry.startTime,
@@ -40,6 +39,11 @@ class TimeTableManagementFormViewModel @Inject constructor(
                 type = timeEntry.type,
                 room = timeEntry.room
             ))
+            Log.d("Inserted value in addtimetable:",id.toString())
+            if(id?.id != null){
+                val entry = timeEntry.copy(id = id.id)
+                timeRepo.insert(entry)
+            }
         }
     }
 }
