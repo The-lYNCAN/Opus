@@ -71,10 +71,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
-    implementation("io.github.jan-tennert.supabase:auth-kt:3.0.1")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:storage-kt")
     implementation("io.ktor:ktor-client-android:3.0.0-rc-1")
+
 
     implementation("androidx.credentials:credentials:1.2.0") // Use the latest stable version
     implementation("androidx.credentials:credentials-play-services-auth:1.2.0") // Optional - needed for credentials support from play services, for devices running Android 13 and below.
@@ -87,17 +88,6 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51.1") // Use the latest version
     kapt("com.google.dagger:hilt-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    //glide - image handling library
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-
-    //glide
-    implementation("io.coil-kt.coil3:coil-compose:3.0.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
-
-    //Pager For Pdfs
-    implementation("androidx.compose.foundation:foundation:1.7.0")
 
     //zoomable
     implementation("net.engawapg.lib:zoomable:2.0.0")

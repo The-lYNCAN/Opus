@@ -1,9 +1,8 @@
 package com.lyncan.opus.Modules
 
 import android.content.Context
+import com.lyncan.opus.DataLayer.Repositories.SupabaseRepository
 import com.lyncan.opus.MyApplication
-import com.lyncan.opus.Repositories.SupabaseRepository
-import com.lyncan.opus.Repositories.UserState
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,12 +24,16 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideClient(): SupabaseClient{
+    fun provideClient(
+        @ApplicationContext context: Context
+    ): SupabaseClient{
         return createSupabaseClient(
             supabaseUrl = "https://tuqcjuywjjtwidvdprel.supabase.co",
             supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1cWNqdXl3amp0d2lkdmRwcmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3NzE5OTEsImV4cCI6MjA2MjM0Nzk5MX0.SonTv7wP4kw_mQsakdfPC3Jg8wPw7Oi6gMxXLA5i2fw"
         ) {
-            install(Auth)
+            install(Auth){
+                alwaysAutoRefresh = true
+            }
             install(Postgrest)
             install(Storage)
         }
@@ -45,14 +48,10 @@ object AuthModule {
     @Provides
     @Singleton
     fun provideSupabaseRepository(
-        supabaseClient: SupabaseClient,
-        applicationScope: CoroutineScope,
-        @ApplicationContext context: Context,
+        supabaseClient: SupabaseClient
     ): SupabaseRepository {
         return SupabaseRepository(
-            supabaseClient = supabaseClient,
-            applicationScope = applicationScope,
-            context = context,
+            supabaseClient = supabaseClient
         )
     }
 
@@ -62,9 +61,7 @@ object AuthModule {
         return application.applicationContext
     }
 
-    @Provides
-    @Singleton
-    fun provideUserState(): UserState {
-        return UserState()
-    }
+
+
+
 }
