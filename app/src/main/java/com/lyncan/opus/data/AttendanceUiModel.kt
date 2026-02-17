@@ -1,7 +1,7 @@
 package com.lyncan.opus.data
 
-import com.lyncan.opus.entities.AttendanceEntity
-import com.lyncan.opus.entities.SubjectEntity
+import com.lyncan.opus.DataLayer.local.entities.AttendanceEntity
+import com.lyncan.opus.DataLayer.local.entities.SubjectEntity
 
 data class AttendanceUiModel(
     val attendance: AttendanceEntity,

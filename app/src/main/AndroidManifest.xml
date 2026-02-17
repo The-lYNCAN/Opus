@@ -21,7 +21,7 @@
         android:theme="@style/Theme.KaamKarlo">
         <profileable android:shell="true" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Presentation.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.App.SplashScreen"

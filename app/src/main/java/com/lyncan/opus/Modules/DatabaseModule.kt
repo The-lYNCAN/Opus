@@ -2,13 +2,13 @@ package com.lyncan.opus.Modules
 
 import android.content.Context
 import androidx.room.Room
-import com.lyncan.opus.DAOs.AttendanceDAO
-import com.lyncan.opus.DAOs.SubjectDAO
-import com.lyncan.opus.DAOs.TimeTableDAO
-import com.lyncan.opus.Repositories.AppDatabase
-import com.lyncan.opus.Repositories.AttendanceRepository
-import com.lyncan.opus.Repositories.SubjectRepository
-import com.lyncan.opus.Repositories.TimeTableRepository
+import com.lyncan.opus.DataLayer.local.DAOs.AttendanceDAO
+import com.lyncan.opus.DataLayer.local.DAOs.SubjectDAO
+import com.lyncan.opus.DataLayer.local.DAOs.TimeTableDAO
+import com.lyncan.opus.DataLayer.Repositories.AppDatabase
+import com.lyncan.opus.DataLayer.Repositories.AttendanceRepository
+import com.lyncan.opus.DataLayer.Repositories.SubjectRepository
+import com.lyncan.opus.DataLayer.Repositories.TimeTableRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
