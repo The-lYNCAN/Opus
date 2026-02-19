@@ -79,11 +79,12 @@ fun AttendanceHistoryCard(item: AttendanceDetailItem, onEdit: (Int, Boolean) -> 
                 }
 
             }else{
-
-                IconButton(onClick = {
-                    editing.value = true
-                }) {
-                    Icon(Icons.Default.Edit, contentDescription = null)
+                if(item.timeTableId != null){
+                    IconButton(onClick = {
+                        editing.value = true
+                    }) {
+                        Icon(Icons.Default.Edit, contentDescription = null)
+                    }
                 }
             }
 

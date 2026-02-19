@@ -32,7 +32,7 @@ class GetDetailsUseCase @Inject constructor(
                     present = totalPresent,
                     absent = totalAbsent,
                     percentage = format.format(percentage).toDouble(),
-                    List = it.map { AttendanceDetailItem(it.id, it.isPresent, it.time, it.date) },
+                    List = it.map { AttendanceDetailItem(it.id, it.isPresent, it.time, it.date, timeTableId = it.timeTableId) },
                     subjectCode = subjectDetails?.code
 
                 )

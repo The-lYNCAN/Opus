@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.lyncan.opus.DataLayer.local.DAOs.AttendanceDAO
 import com.lyncan.opus.DataLayer.local.DAOs.SubjectDAO
 import com.lyncan.opus.DataLayer.local.DAOs.TimeTableDAO
-import com.lyncan.opus.DataLayer.Repositories.AppDatabase
+import com.lyncan.opus.Common.AppDatabase
 import com.lyncan.opus.DataLayer.Repositories.AttendanceRepository
 import com.lyncan.opus.DataLayer.Repositories.SubjectRepository
 import com.lyncan.opus.DataLayer.Repositories.TimeTableRepository

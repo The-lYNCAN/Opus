@@ -8,31 +8,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.lyncan.opus.DataLayer.local.entities.AttendanceEntity
-import com.lyncan.opus.DataLayer.local.entities.SubjectEntity
 import com.lyncan.opus.Presentation.viewmodels.AttendanceViewModel
 
 @Composable
 fun SubjectList(navController: NavController, viewModel: AttendanceViewModel) {
-    val attendance = viewModel.getAllAttendance().collectAsState(emptyList())
-    val allAttendance = remember { mutableStateOf<Map<SubjectEntity, List<AttendanceEntity>>?>(null) }
-    val tt = viewModel.getTT().collectAsState(emptyList())
-    LaunchedEffect(attendance.value) {
-        val everything = attendance.value.groupBy { it.subjectId }
-        allAttendance.value = everything.mapKeys { entry ->
-            val subjectId = entry.key
-            viewModel.getSubjectById(subjectId) ?: SubjectEntity(subjectId, "Unknown Subject", "N/A", 0)
-        }
-    }
-    Log.d("SubjectListAttendance", "Attendance grouped by subject: $attendance")
+
+    val attendances = viewModel.retrievalState.collectAsState().value
+    Log.d("SubjectList", "Retrieved attendances: $attendances")
+
     LazyColumn(modifier = Modifier.padding(top = 10.dp)) {
         item{
 
@@ -40,12 +28,13 @@ fun SubjectList(navController: NavController, viewModel: AttendanceViewModel) {
             Text("Track your class participation", style = MaterialTheme.typography.titleMedium, color = Color.Black.copy(alpha = .8f))
             Spacer(modifier = Modifier.height(16.dp))
         }
-        allAttendance.value?.forEach { subject, attendanceList ->
+        attendances.list.forEach { it ->
 //                SubjectCard(subject, attendanceList, navController)
             item{
-                SubjectCard(navController, subject, attendanceList, tt)
+                SubjectCard(navController, it)
             }
         }
+
 
 
     }

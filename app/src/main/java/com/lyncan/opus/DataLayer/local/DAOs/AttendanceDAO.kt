@@ -29,6 +29,7 @@ interface AttendanceDAO {
     """)
     fun getAttendanceByDate(date: String): Flow<List<AttendanceEntity>>
 
+
     @Update
     suspend fun updateAttendance(attendance: AttendanceEntity)
 

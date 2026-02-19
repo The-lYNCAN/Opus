@@ -5,4 +5,5 @@ data class AttendanceDetailItem(
     val status: Boolean?,
     val time: String,
     val date: String,
+    val timeTableId: Int?
 )

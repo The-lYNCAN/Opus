@@ -1,18 +1,22 @@
 package com.lyncan.opus.Presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lyncan.opus.Presentation.viewmodels.Components.toLocalTime
 import com.lyncan.opus.DataLayer.Repositories.AttendanceRepository
 import com.lyncan.opus.DataLayer.Repositories.SubjectManagement
 import com.lyncan.opus.DataLayer.Repositories.SubjectRepository
 import com.lyncan.opus.DataLayer.Repositories.TimeTableRepository
-import com.lyncan.opus.data.AttendanceUiModel
 import com.lyncan.opus.DataLayer.local.entities.AttendanceEntity
+import com.lyncan.opus.Domain.UseCases.AttendanceUseCase.MarkAttendanceUseCase
+import com.lyncan.opus.Domain.UseCases.AttendanceUseCase.RetrieveAttendanceUseCase
+import com.lyncan.opus.Domain.UseCases.AttendanceUseCase.toLocalTime
+import com.lyncan.opus.Presentation.States.AttendanceRetrievalState
+import com.lyncan.opus.data.AttendanceUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -24,19 +28,14 @@ import javax.inject.Inject
 class AttendanceViewModel @Inject constructor(
     private val attendanceRepository: AttendanceRepository,
     private val subjectRepository: SubjectRepository,
-    val timetableRepo : TimeTableRepository,
-    val subMan: SubjectManagement
-): ViewModel() {
+    private val timetableRepo: TimeTableRepository,
+    private val subMan: SubjectManagement,
+    private val retrieveAttendanceUseCase: RetrieveAttendanceUseCase,
+    private val markAttendanceUseCase: MarkAttendanceUseCase
+) : ViewModel() {
 
-    private val _mark = MutableStateFlow<Boolean>(true)
-    val mark = _mark
-    private val _attendanceItems = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
-    val attendanceItems = _attendanceItems
-    suspend fun getSubjectById(id: Int) = subjectRepository.getSubjectById(id)
-    fun getAllSubjects() = subjectRepository.getAllSubjects()
-    fun getAllAttendance() = attendanceRepository.getALl()
-    fun getTT() = timetableRepo.getAllTimeTableEntries()
-    val dayMap = mapOf(
+    private val today = LocalDate.now(ZoneId.systemDefault())
+    private val dayMap = mapOf(
         DayOfWeek.MONDAY to "MON",
         DayOfWeek.TUESDAY to "TUE",
         DayOfWeek.WEDNESDAY to "WED",
@@ -45,45 +44,55 @@ class AttendanceViewModel @Inject constructor(
         DayOfWeek.SATURDAY to "SAT",
         DayOfWeek.SUNDAY to "SUN"
     )
+    private val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
 
-    init{
-        val today = LocalDate.now(ZoneId.systemDefault())
-        val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
-        Log.d("AttendanceViewModel", "Today is: $todayAccordingToDB, ${LocalDate.now(ZoneId.systemDefault())}")
-        viewModelScope.launch {
-            subMan.Retrieve()
-            subMan.retrieveTimeTable()
-            val timeTableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
-            timeTableEntries.forEach {
-                val attendanceEnt = AttendanceEntity(subjectId = it.subjectid, date = today.toString(), time = "", isPresent = null, timeTableId = it.id)
-                if(!attendanceRepository.attendancePresent(attendanceEnt.date, attendanceEnt.timeTableId)){
-                    attendanceRepository.insert(attendanceEnt)
-                }
+    /* ---------------------------
+       Attendance Summary State
+    ---------------------------- */
+
+    val retrievalState: StateFlow<AttendanceRetrievalState> =
+        retrieveAttendanceUseCase()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                AttendanceRetrievalState(emptyList())
+            )
+
+    /* ---------------------------
+       Today's Attendance
+    ---------------------------- */
+
+    private val attendanceTodayFlow =
+        attendanceRepository.getAttendanceByDate(today.toString())
+
+    /* ---------------------------
+       Mark Button State
+    ---------------------------- */
+
+    val mark: StateFlow<Boolean> =
+        attendanceTodayFlow
+            .map { list ->
+                list.none { it.isPresent == null && !it.custom && it.time.split(" - ")[1].toLocalTime() < LocalTime.now() }
+//                list.none { it.isPresent == null && !it.custom }
             }
-            val attendance = attendanceRepository.getTodaysAttendance(today.toString())
-            attendance.collect {
-                it.forEach { att ->
-                    val attendanceTime = timeTableEntries.firstOrNull{it.id == att.timeTableId}?.endTime
-                    if (attendanceTime != null && attendanceTime.toLocalTime() < LocalTime.now()){
-                        if (att.isPresent == null){
-                            mark.value = false
-                        }
-                    }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                true
+            )
 
-                }
-            }
-        }
-    }
+    /* ---------------------------
+       Pending Attendance Items
+    ---------------------------- */
 
-    fun retrieve(){
-        viewModelScope.launch {
-            val today = LocalDate.now(ZoneId.systemDefault())
-            val todayAccordingToDB = dayMap.getValue(today.dayOfWeek)
+    val attendanceItems: StateFlow<List<AttendanceUiModel>> =
+        attendanceTodayFlow
+            .map { attendanceList ->
 
-            val timetableEntries = timetableRepo.getTimeTableByDay(todayAccordingToDB)
+                val timetableEntries =
+                    timetableRepo.getTimeTableByDay(todayAccordingToDB)
 
-            attendanceRepository.getTodaysAttendance(today.toString()).collect {
-                val uiItems = it
+                attendanceList
                     .filter { att ->
                         val endTime = timetableEntries
                             .firstOrNull { it.id == att.timeTableId }
@@ -94,40 +103,67 @@ class AttendanceViewModel @Inject constructor(
                                 endTime < LocalTime.now() &&
                                 att.isPresent == null
                     }
-                    .map { att ->
-                        val subject = subjectRepository.getSubjectById(att.subjectId)
-                        AttendanceUiModel(att, subject!!)
+                    .mapNotNull { att ->
+                        val subject =
+                            subjectRepository.getSubjectById(att.subjectId)
+                        subject?.let { AttendanceUiModel(att, it) }
                     }
-
-                _attendanceItems.value = uiItems
             }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList()
+            )
 
+    /* ---------------------------
+       Init Block
+    ---------------------------- */
+
+    init {
+        viewModelScope.launch {
+            subMan.Retrieve()
+            subMan.retrieveTimeTable()
+//            insertTodayAttendanceIfMissing()
+            markAttendanceUseCase()
         }
     }
-    fun attendedFunc(id: Int){
-        viewModelScope.launch {
-            val today = LocalDate.now(ZoneId.systemDefault())
 
+    private suspend fun insertTodayAttendanceIfMissing() {
+        val timeTableEntries =
+            timetableRepo.getTimeTableByDay(todayAccordingToDB)
+
+        timeTableEntries.forEach {
+            val entity = AttendanceEntity(
+                subjectId = it.subjectid,
+                date = today.toString(),
+                time = "",
+                isPresent = null,
+                timeTableId = it.id
+            )
+
+            if (!attendanceRepository.attendancePresent(
+                    entity.date,
+                    entity.timeTableId!!
+                )
+            ) {
+                attendanceRepository.insert(entity)
+            }
+        }
+    }
+
+    /* ---------------------------
+       Actions
+    ---------------------------- */
+
+    fun attendedFunc(id: Int) {
+        viewModelScope.launch {
             attendanceRepository.markPresent(id)
-            attendanceRepository.getTodaysAttendance(today.toString()).collect {
-                if (it.firstOrNull{it.isPresent == null} == null){
-                    mark.value = true
-                }
-            }
-
         }
     }
 
-    fun bunkedFunc(id: Int){
-
+    fun bunkedFunc(id: Int) {
         viewModelScope.launch {
-            val today = LocalDate.now(ZoneId.systemDefault())
-
             attendanceRepository.markAbsent(id)
-            if(attendanceRepository.getTodaysAttendance(today.toString()).first().firstOrNull{it.isPresent == null} == null){
-                mark.value = true
-            }
         }
     }
-
 }
