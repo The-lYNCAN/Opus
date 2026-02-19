@@ -1,4 +1,4 @@
-package com.lyncan.opus.DataLayer.Repositories
+package com.lyncan.opus.Common
 
 import android.content.Context
 import androidx.room.Database
@@ -13,7 +13,7 @@ import com.lyncan.opus.DataLayer.local.entities.TimeTableEntity
 
 @Database(
     entities = [AttendanceEntity::class, SubjectEntity::class, TimeTableEntity::class],
-    version = 9
+    version = 14
 )
 abstract class AppDatabase: RoomDatabase(){
     abstract fun attendanceDAO(): AttendanceDAO

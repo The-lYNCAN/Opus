@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,10 +15,11 @@ import com.lyncan.opus.Presentation.ui.components.markAttendance.Card
 import com.lyncan.opus.Presentation.viewmodels.AttendanceViewModel
 
 @Composable
-fun MarkAttendanceScreen(viewModel: AttendanceViewModel) {
+fun MarkAttendanceScreen(viewModel: AttendanceViewModel, marked: State<Boolean>) {
 //    val viewModel = hiltViewModel<MarkAttendanceViewModel>()
-    viewModel.retrieve()
+//    viewModel.retrieve()
     val attendanceItems = viewModel.attendanceItems.collectAsState()
+
     Column(modifier = Modifier
         .statusBarsPadding()
         .fillMaxSize()) {

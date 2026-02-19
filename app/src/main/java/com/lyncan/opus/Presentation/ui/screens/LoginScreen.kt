@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +44,9 @@ fun LoginScreen(
     sharedViewModel: MainViewModel
 ) {
     val viewModel: LoginViewModel = hiltViewModel()
+    if(viewModel.user.collectAsState().value != null){
+        onLogin()
+    }
     val context = LocalContext.current
 
     // ✅ Activity Result Launcher

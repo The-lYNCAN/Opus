@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
         ForeignKey(entity = TimeTableEntity::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("timeTableId"),
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.SET_NULL
         )
     ],
     indices = [Index("subjectId"), Index("timeTableId")]
@@ -28,5 +28,6 @@ data class AttendanceEntity(
     val date: String,
     val time: String,
     val isPresent: Boolean? = null,
-    val timeTableId: Int
+    val timeTableId: Int? = null,
+    val custom: Boolean = false
 )

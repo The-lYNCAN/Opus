@@ -75,9 +75,10 @@ class AttendanceRepository(private val attendanceDao: AttendanceDAO) {
                         attendance.timeTableId == timeTableId
             }
     }
-    fun getTodaysAttendance(date: String): Flow<List<AttendanceEntity>> {
+    fun getAttendanceByDate(date: String): Flow<List<AttendanceEntity>> {
         return attendanceDao.getAttendanceByDate(date)
     }
+
 
 
 }

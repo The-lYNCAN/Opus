@@ -19,9 +19,8 @@ import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,38 +29,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.lyncan.opus.DataLayer.local.entities.SubjectEntity
-import com.lyncan.opus.DataLayer.local.entities.TimeTableEntity
 import com.lyncan.opus.Presentation.viewmodels.Components.HeroViewModel
 
 @Composable
 fun Hero(){
     val viewModel = hiltViewModel<HeroViewModel>()
-    val currentLectures = remember { mutableStateOf<List<TimeTableEntity>>(emptyList()) }
+    val currentLectures = viewModel.state.collectAsState().value?.currentLectures
     val currentLecture = remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        currentLectures.value = viewModel.getCurrentLecture()
-    }
-    val subject = remember { mutableStateOf<SubjectEntity?>(null) }
-    LaunchedEffect(currentLectures.value, currentLecture.intValue) {
-        try {
-            if(currentLectures.value.isEmpty()) {
-                subject.value = null
-                return@LaunchedEffect
-            }
-            subject.value = viewModel.getSubjectNameById(currentLectures.value[currentLecture.intValue].subjectid)
-        }catch (e: Exception) {
-            subject.value = null
-        }
-    }
+
     Column(modifier = Modifier
         .clickable {
-            if (currentLectures.value.size > 1) {
-                currentLecture.intValue++
-
-                if (currentLecture.intValue == currentLectures.value.size) {
-                    currentLecture.intValue = 0
-                }
+            currentLecture.intValue++
+            if(currentLectures?.size == currentLecture.intValue){
+                currentLecture.intValue = 0
             }
         }
         .fillMaxWidth()
@@ -93,9 +73,17 @@ fun Hero(){
             }
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 Text("Current Lecture", color = Color.White.copy(.7f),)
-                Text(subject.value?.name ?: "No Lecture", color = Color.White.copy(.7f), fontSize = 30.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                if(currentLectures?.isNotEmpty()?: false){
+                    Text(
+                        currentLectures.get(currentLecture.intValue)?.subjectName ?: "No Lecture", color = Color.White.copy(.7f), fontSize = 30.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
+                }else{
+                    Text(
+                        "No Lecture", color = Color.White.copy(.7f), fontSize = 30.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
+                }
             }
         }
         Row (modifier = Modifier.padding(top = 14.dp )){
@@ -106,15 +94,15 @@ fun Hero(){
                 tint = Color.White.copy(.7f)
             )
             Text("${
-                if (currentLectures.value.size != 0){
-                    currentLectures.value.get(currentLecture.intValue).startTime                    
+                if (currentLectures?.isNotEmpty()?: false){
+                    currentLectures[currentLecture.intValue]?.startTime                    
                 } else {
                     "No Lecture"
                 }
 
             } - ${
-                if (currentLectures.value.size != 0){
-                    currentLectures.value.get(currentLecture.intValue).endTime
+                if (currentLectures?.isNotEmpty()?: false){
+                    currentLectures.get(currentLecture.intValue)?.endTime
                 } else {
                     "No Lecture"
                 }

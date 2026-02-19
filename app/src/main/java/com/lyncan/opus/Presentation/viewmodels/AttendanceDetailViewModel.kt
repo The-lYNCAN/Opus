@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.lyncan.opus.Domain.UseCases.AttendanceDetailsUseCases.AttendanceDetailsEvents
 import com.lyncan.opus.Domain.UseCases.AttendanceDetailsUseCases.EditAttendanceUseCase
 import com.lyncan.opus.Domain.UseCases.AttendanceDetailsUseCases.GetDetailsUseCase
+import com.lyncan.opus.Domain.UseCases.AttendanceDetailsUseCases.SetCustomAttendanceUseCase
 import com.lyncan.opus.Presentation.States.AttendanceDetailState
 import com.lyncan.opus.Presentation.States.AttendanceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class AttendanceDetailViewModel @Inject constructor(
     private val getDetailUseCase: GetDetailsUseCase,
     private val editAttendanceUseCase: EditAttendanceUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val setCustomAttendanceUseCase: SetCustomAttendanceUseCase
 ): ViewModel() {
     val subId = savedStateHandle.get<Int>("Subject_Id_Key")
     private val _state = MutableStateFlow<AttendanceDetailState?>(null)
@@ -64,9 +66,11 @@ class AttendanceDetailViewModel @Inject constructor(
 
 
             is AttendanceDetailsEvents.EditButtonConfirmed -> {
+                viewModelScope.launch {
+                    setCustomAttendanceUseCase(event.total, event.present, subId ?: 0)
+                    _uiState.update { it.copy(showDialog = false) }
+                }
 
-
-                _uiState.update { it.copy(showDialog = false) }
 
             }
             is AttendanceDetailsEvents.EditButtonDismissed -> {
